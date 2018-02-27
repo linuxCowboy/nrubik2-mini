@@ -8,6 +8,4 @@ An N-Curses Based, Virtual Pocket Cube
  - Full undo/redo
  - Timer
 
-![Big-Cubies](nrubik2-mini_big.jpg?raw=true)
-
 This version was inspired by the original **nrubik**.
