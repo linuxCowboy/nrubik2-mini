@@ -40,6 +40,7 @@ redo = chr(10)
 
 reset = 'KEY_HOME'
 solve = 'KEY_END'
+layout = 'KEY_IC'
 pause = ' '
 quit = chr(27)
 
@@ -501,6 +502,24 @@ class Cube:
 
         elif key == solve:
             self.cube = copy.deepcopy(self.solved_cube)
+
+        elif key == layout:
+            self.mode = (self.mode + 1) % 4
+
+            if self.mode <= 1:
+                curses.init_pair(1, curses.COLOR_WHITE, -1)
+                curses.init_pair(2, curses.COLOR_YELLOW, -1)
+                curses.init_pair(3, curses.COLOR_MAGENTA, -1)
+                curses.init_pair(4, curses.COLOR_RED, -1)
+                curses.init_pair(5, curses.COLOR_GREEN, -1)
+                curses.init_pair(6, curses.COLOR_BLUE, -1)
+            else:
+                curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_WHITE)
+                curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_YELLOW)
+                curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_MAGENTA)
+                curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED)
+                curses.init_pair(5, curses.COLOR_GREEN, curses.COLOR_GREEN)
+                curses.init_pair(6, curses.COLOR_BLUE, curses.COLOR_BLUE)
 
         elif key == pause:
             self.pausing = not self.pausing
