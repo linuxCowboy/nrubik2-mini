@@ -43,9 +43,9 @@ solve = 'KEY_END'
 pause = ' '
 quit = chr(27)
 
-import random
 import curses
 import copy
+import random
 import time
 
 buf_undo = buf_redo = ""
@@ -122,15 +122,16 @@ class Cube:
         self.stdscr.addstr(start_y + 10, start_x + 0, cube_y + "," + cube_y.upper() + " - Cube Y")
         self.stdscr.addstr(start_y + 11, start_x + 0, cube_z + "," + cube_z.upper() + " - Cube Z")
 
-        self.stdscr.addstr(start_y + 13, start_x + 0, "Home - Reset")
-        self.stdscr.addstr(start_y + 14, start_x + 0, "End  - Solve")
+        self.stdscr.addstr(start_y + 14, start_x + 0, "Home - Reset")
+        self.stdscr.addstr(start_y + 15, start_x + 0, "End  - Solve")
 
         self.stdscr.addstr(start_y + 9, max_x - 2 - end_x, "Backspace - Undo")
         self.stdscr.addstr(start_y + 10, max_x - 2 - end_x, "Enter     - Redo")
         self.stdscr.addstr(start_y + 11, max_x - 2 - end_x, "Delete    - Delete")
 
-        self.stdscr.addstr(start_y + 13, max_x - 2 - end_x, "Space  - Timer")
-        self.stdscr.addstr(start_y + 14, max_x - 2 - end_x, "Escape - Quit")
+        self.stdscr.addstr(start_y + 13, max_x - 2 - end_x, "Insert - Layout")
+        self.stdscr.addstr(start_y + 14, max_x - 2 - end_x, "Space  - Timer")
+        self.stdscr.addstr(start_y + 15, max_x - 2 - end_x, "Escape - Quit")
 
     def solved(self):
         return self.cube == self.solved_cube
@@ -198,7 +199,7 @@ class Cube:
         if len(buf) > max:
             buf = buf[:max]
             buf += " ...  "
-        self.stdscr.addstr(int(max_y / 2 + 6 + 1), 0, "Redo ({:.0f}):{:s}".format(len(buf_redo) / 2, buf))
+        self.stdscr.addstr(int(max_y / 2 + 6 + 2), 0, "Redo ({:.0f}):{:s}".format(len(buf_redo) / 2, buf))
 
         # trace undo
         max = int((max_x + max_x / 2 - 14 - 4 + 2) / 2 * 2)
