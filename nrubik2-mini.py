@@ -58,30 +58,33 @@ class Cube:
     looping = True
     pausing = True
 
+    # mode 0: b/w  mode 1: original nrubik  mode 2: nrubik2  mode 3: big cubies
+    mode = 2
+
     solved_cube = [
         [
-            ['ww', 'ww'],
-            ['ww', 'ww'],
+            ['W', 'W'],
+            ['W', 'W'],
         ],
         [
-            ['yy', 'yy'],
-            ['yy', 'yy'],
+            ['Y', 'Y'],
+            ['Y', 'Y'],
         ],
         [
-            ['rr', 'rr'],
-            ['rr', 'rr'],
+            ['R', 'R'],
+            ['R', 'R'],
         ],
         [
-            ['mm', 'mm'],
-            ['mm', 'mm'],
+            ['M', 'M'],
+            ['M', 'M'],
         ],
         [
-            ['bb', 'bb'],
-            ['bb', 'bb'],
+            ['B', 'B'],
+            ['B', 'B'],
         ],
         [
-            ['gg', 'gg'],
-            ['gg', 'gg'],
+            ['G', 'G'],
+            ['G', 'G'],
         ],
     ]
 
@@ -94,12 +97,20 @@ class Cube:
         self.cube = copy.deepcopy(self.solved_cube)
 
         if curses.has_colors():
-            curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_WHITE)
-            curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_YELLOW)
-            curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_MAGENTA)
-            curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED)
-            curses.init_pair(5, curses.COLOR_GREEN, curses.COLOR_GREEN)
-            curses.init_pair(6, curses.COLOR_BLUE, curses.COLOR_BLUE)
+            if self.mode == 1:
+                curses.init_pair(1, curses.COLOR_WHITE, -1)
+                curses.init_pair(2, curses.COLOR_YELLOW, -1)
+                curses.init_pair(3, curses.COLOR_MAGENTA, -1)
+                curses.init_pair(4, curses.COLOR_RED, -1)
+                curses.init_pair(5, curses.COLOR_GREEN, -1)
+                curses.init_pair(6, curses.COLOR_BLUE, -1)
+            else:
+                curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_WHITE)
+                curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_YELLOW)
+                curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_MAGENTA)
+                curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED)
+                curses.init_pair(5, curses.COLOR_GREEN, curses.COLOR_GREEN)
+                curses.init_pair(6, curses.COLOR_BLUE, curses.COLOR_BLUE)
 
     def helper(self):
         max_y, max_x = self.stdscr.getmaxyx()
