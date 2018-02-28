@@ -155,11 +155,19 @@ class Cube:
         self.stdscr.addstr(int(max_y / 2 - 10), int(max_x / 2 - 1 - (len(okay) / 2)), okay)
 
     def display_cubie(self, y, x, cubie):
-        colors = {'ww': 1, 'yy': 2, 'mm': 3, 'rr': 4, 'gg': 5, 'bb': 6}
-        if curses.has_colors() == False:
-            self.stdscr.addstr(int(y), int(x), cubie)
+        colors = {'W': 1, 'Y': 2, 'M': 3, 'R': 4, 'G': 5, 'B': 6}
+
+        if self.mode == 2:
+            cub = cubie * 2
+        elif self.mode == 3:
+            cub = cubie * 4
         else:
-            self.stdscr.addstr(int(y), int(x), cubie, curses.color_pair(colors[cubie]))
+            cub = cubie
+
+        if curses.has_colors() == False or self.mode == 0:
+            self.stdscr.addstr(int(y), int(x), cub)
+        else:
+            self.stdscr.addstr(int(y), int(x), cub, curses.color_pair(colors[cubie]))
 
     def display_cube(self):
         global buf_undo, watch, time_last
