@@ -50,16 +50,16 @@ import random
 import time
 
 buf_undo = buf_redo = ""
-time_last = time.time()
-watch = 0
 
 class Cube:
 
-    looping = True
-    pausing = True
-
     # mode 0: b/w  mode 1: original nrubik  mode 2: nrubik2  mode 3: big cubies
     mode = 2
+
+    looping = True
+    pausing = True
+    watch = 0
+    time_last = time.time()
 
     solved_cube = [
         [
@@ -174,10 +174,10 @@ class Cube:
             self.stdscr.addstr(int(y), int(x), cub, curses.color_pair(colors[cubie]))
 
     def display_cube(self):
-        global watch, time_last
         max_y, max_x = self.stdscr.getmaxyx()
         self.stdscr.scrollok(1)
 
+        # nrubik + b/w
         if self.mode <= 1:
             # top
             for i, line in enumerate(self.cube[0]):
@@ -204,6 +204,7 @@ class Cube:
                 for j in range(2):
                     self.display_cubie(max_y / 2 - 5 + i, max_x / 2 + 4 + j, line[j])
 
+        # nrubik2
         elif self.mode == 2:
             # bars
             self.stdscr.addstr(int(max_y / 2 - 6), int(max_x / 2 - 7), "__________________")
@@ -245,6 +246,7 @@ class Cube:
             self.display_cubie(max_y / 2 + 3, max_x / 2 + 6, self.cube[5][1][0])
             self.display_cubie(max_y / 2 + 3, max_x / 2 - 8, self.cube[5][1][1])
 
+        # nrubik2 big cubie
         elif self.mode == 3:
             # bars
             self.stdscr.addstr(int(max_y / 2 - 9), int(max_x / 2 - 13), "______________________________")
@@ -313,11 +315,11 @@ class Cube:
         # timer
         time_curr = time.time()
         if self.pausing is False:
-            watch += time_curr - time_last
-        time_last = time_curr
+            self.watch += time_curr - self.time_last
+        self.time_last = time_curr
 
         self.stdscr.addstr(int(2), int(max_x - 2 - 8),
-                '{:02}:{:02}:{:02}'.format(int(watch/60/60%24), int(watch/60%60), int(watch%60)),
+                '{:02}:{:02}:{:02}'.format(int(self.watch/60/60%24), int(self.watch/60%60), int(self.watch%60)),
                     curses.color_pair(0) | curses.A_STANDOUT | curses.A_DIM if self.pausing == True else curses.A_NORMAL)
 
     def turn_top(self):
@@ -560,14 +562,15 @@ class Cube:
         self.turn_back()
 
     def scramble(self):
-        global buf_undo, buf_redo, watch
+        global buf_undo, buf_redo
         functions = [self.turn_top, self.turn_bottom, self.turn_left,
                      self.turn_right, self.turn_front, self.turn_back]
         for i in range(30):
             functions[random.randint(0, 5)]()
 
         buf_undo = buf_redo =  ""
-        watch = 0
+        self.watch = 0
+        self.time_last = time.time()
         self.pausing = False
 
     def get_input(self):
