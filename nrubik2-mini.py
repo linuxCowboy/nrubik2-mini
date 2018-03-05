@@ -97,7 +97,7 @@ class Cube:
         self.cube = copy.deepcopy(self.solved_cube)
 
         if curses.has_colors():
-            if self.mode == 1:
+            if self.mode <= 1:
                 curses.init_pair(1, curses.COLOR_WHITE, -1)
                 curses.init_pair(2, curses.COLOR_YELLOW, -1)
                 curses.init_pair(3, curses.COLOR_MAGENTA, -1)
@@ -155,8 +155,13 @@ class Cube:
     def print_solve(self):
         max_y, max_x = self.stdscr.getmaxyx()
         self.pausing = True
-        okay = "Solved! 'Home' for Restart"
-        self.stdscr.addstr(int(max_y / 2 - 10), int(max_x / 2 - 1 - (len(okay) / 2)), okay)
+
+        if len(buf_undo) == 0:
+            appeal = "'Home' for Start!"
+        else:
+            appeal = "Solved. Congrats!"
+
+        self.stdscr.addstr(int(max_y / 2 - 10), int(max_x / 2 - 1 - (len(appeal) / 2)), appeal)
 
     def display_cubie(self, y, x, cubie):
         colors = {'W': 1, 'Y': 2, 'M': 3, 'R': 4, 'G': 5, 'B': 6}
@@ -521,44 +526,32 @@ class Cube:
 
     # cube x-axis r/L
     def move_x(self):
-        # change right
         self.turn_right()
-        # change left
         self.turn_left_rev()
 
-    # cube x-axis R/l
+    # R/l
     def move_x_rev(self):
-        # change right
         self.turn_right_rev()
-        # change left
         self.turn_left()
 
     # cube y-axis u/D
     def move_y(self):
-        # change top
         self.turn_top()
-        # change bottom
         self.turn_bottom_rev()
 
-    # cube y-axis U/d
+    # U/d
     def move_y_rev(self):
-        # change top
         self.turn_top_rev()
-        # change bottom
         self.turn_bottom()
 
     # cube z-axis f/B
     def move_z(self):
-        # change front
         self.turn_front()
-        # change back
         self.turn_back_rev()
 
-    # cube z-axis F/b
+    # F/b
     def move_z_rev(self):
-        # change front
         self.turn_front_rev()
-        # change back
         self.turn_back()
 
     def scramble(self):
