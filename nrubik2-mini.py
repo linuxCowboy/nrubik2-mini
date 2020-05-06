@@ -44,12 +44,18 @@ layout = 'KEY_IC'
 pause = ' '
 quit = chr(27)
 
+macros = {
+    '6': 'lFLDLdf',   # line
+    '7': 'flfLDLd',   # diag
+    '8': 'DRdrDRdr',  # front
+    '9': 'RDrdRDrd'}  # side
+
 import curses
 import copy
 import random
 import time
 
-buf_undo = buf_redo = ""
+buf_undo = buf_redo = auto_buf = ""
 
 class Cube:
 
@@ -566,158 +572,172 @@ class Cube:
         self.time_last = time.time()
         self.pausing = False
 
-    def get_input(self):
-        global buf_undo, buf_redo
-        key = None
+    def get_input(self, key = ''):
+        global buf_undo, buf_redo, auto_buf
         dismiss = False
+
         try:
-            key = self.stdscr.getkey()
+            if not key:
+                key = self.stdscr.getkey()
+
+            # trace buffer
+            if key == delete:
+                key = buf_undo[-2:-1]
+                key = key.lower() if key == key.upper() else key.upper()
+                buf_undo = buf_undo[:-2]
+                dismiss = True
+
+            elif key == undo:
+                key = buf_undo[-2:-1]
+                key = key.lower() if key == key.upper() else key.upper()
+                buf_redo += buf_undo[-2:]
+                buf_undo = buf_undo[:-2]
+                dismiss = True
+
+            elif key == redo:
+                key = buf_redo[-2:-1]
+                buf_redo = buf_redo[:-2]
+
+            # controls
+            if key == reset:
+                self.scramble()
+
+            elif key == solve:
+                self.cube = copy.deepcopy(self.solved_cube)
+
+            elif key == layout:
+                self.mode = (self.mode + 1) % 4
+
+                if self.mode <= 1:
+                    curses.init_pair(1, curses.COLOR_WHITE, -1)
+                    curses.init_pair(2, curses.COLOR_YELLOW, -1)
+                    curses.init_pair(3, curses.COLOR_MAGENTA, -1)
+                    curses.init_pair(4, curses.COLOR_RED, -1)
+                    curses.init_pair(5, curses.COLOR_GREEN, -1)
+                    curses.init_pair(6, curses.COLOR_BLUE, -1)
+                else:
+                    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_WHITE)
+                    curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_YELLOW)
+                    curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_MAGENTA)
+                    curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED)
+                    curses.init_pair(5, curses.COLOR_GREEN, curses.COLOR_GREEN)
+                    curses.init_pair(6, curses.COLOR_BLUE, curses.COLOR_BLUE)
+
+            elif key == pause:
+                self.pausing = not self.pausing
+
+            elif key == quit:
+                self.looping = False
+
+            elif key in macros:
+                auto_buf = macros[key]
+
+            # moves
+            elif key == up:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_top()
+            elif key == up.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_top_rev()
+
+            elif key == down:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_bottom()
+            elif key == down.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_bottom_rev()
+
+            elif key == left:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_left()
+            elif key == left.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_left_rev()
+
+            elif key == right:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_right()
+            elif key == right.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_right_rev()
+
+            elif key == front:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_front()
+            elif key == front.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_front_rev()
+
+            elif key == back:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_back()
+            elif key == back.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.turn_back_rev()
+
+            # turns
+            elif key == cube_x:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.move_x()
+            elif key == cube_x.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.move_x_rev()
+
+            elif key == cube_y:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.move_y()
+            elif key == cube_y.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.move_y_rev()
+
+            elif key == cube_z:
+                if not dismiss:
+                    buf_undo += key + " "
+                self.move_z()
+            elif key == cube_z.upper():
+                if not dismiss:
+                    buf_undo += key + " "
+                self.move_z_rev()
+
         except curses.error:
             pass
 
-        # trace buffer
-        if key == delete:
-            key = buf_undo[-2:-1]
-            key = key.lower() if key == key.upper() else key.upper()
-            buf_undo = buf_undo[:-2]
-            dismiss = True
-
-        elif key == undo:
-            key = buf_undo[-2:-1]
-            key = key.lower() if key == key.upper() else key.upper()
-            buf_redo += buf_undo[-2:]
-            buf_undo = buf_undo[:-2]
-            dismiss = True
-
-        elif key == redo:
-            key = buf_redo[-2:-1]
-            buf_redo = buf_redo[:-2]
-
-        # controls
-        if key == reset:
-            self.scramble()
-
-        elif key == solve:
-            self.cube = copy.deepcopy(self.solved_cube)
-
-        elif key == layout:
-            self.mode = (self.mode + 1) % 4
-
-            if self.mode <= 1:
-                curses.init_pair(1, curses.COLOR_WHITE, -1)
-                curses.init_pair(2, curses.COLOR_YELLOW, -1)
-                curses.init_pair(3, curses.COLOR_MAGENTA, -1)
-                curses.init_pair(4, curses.COLOR_RED, -1)
-                curses.init_pair(5, curses.COLOR_GREEN, -1)
-                curses.init_pair(6, curses.COLOR_BLUE, -1)
-            else:
-                curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_WHITE)
-                curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_YELLOW)
-                curses.init_pair(3, curses.COLOR_MAGENTA, curses.COLOR_MAGENTA)
-                curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED)
-                curses.init_pair(5, curses.COLOR_GREEN, curses.COLOR_GREEN)
-                curses.init_pair(6, curses.COLOR_BLUE, curses.COLOR_BLUE)
-
-        elif key == pause:
-            self.pausing = not self.pausing
-
-        elif key == quit:
-            self.looping = False
-
-        # moves
-        elif key == up:
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_top()
-        elif key == up.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_top_rev()
-
-        elif key == down:
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_bottom()
-        elif key == down.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_bottom_rev()
-
-        elif key == left:
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_left()
-        elif key == left.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_left_rev()
-
-        elif key == right:
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_right()
-        elif key == right.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_right_rev()
-
-        elif key == front:
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_front()
-        elif key == front.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_front_rev()
-
-        elif key == back:
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_back()
-        elif key == back.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.turn_back_rev()
-
-        # turns
-        elif key == cube_x:
-            if not dismiss:
-                buf_undo += key + " "
-            self.move_x()
-        elif key == cube_x.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.move_x_rev()
-
-        elif key == cube_y:
-            if not dismiss:
-                buf_undo += key + " "
-            self.move_y()
-        elif key == cube_y.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.move_y_rev()
-
-        elif key == cube_z:
-            if not dismiss:
-                buf_undo += key + " "
-            self.move_z()
-        elif key == cube_z.upper():
-            if not dismiss:
-                buf_undo += key + " "
-            self.move_z_rev()
-
-        time.sleep(0.02)
-
     def loop(self):
+        global auto_buf
+
         while self.looping:
             self.stdscr.erase()
             self.helper()
+
             if self.solved() is True:
                 self.print_solve()
+
             self.display_cube()
             self.stdscr.refresh()
             self.get_input()
+
+            if auto_buf:
+                self.get_input(auto_buf[0])
+                auto_buf = auto_buf[1:]
+                time.sleep(0.4)
+
+            time.sleep(0.04)
 
 def main(stdscr):
     cube = Cube(stdscr)
