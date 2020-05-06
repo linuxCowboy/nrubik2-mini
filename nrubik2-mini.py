@@ -143,6 +143,8 @@ class Cube:
         self.stdscr.addstr(start_y + 14, start_x + 0, "Home - Reset")
         self.stdscr.addstr(start_y + 15, start_x + 0, "End  - Solve")
 
+        self.stdscr.addstr(start_y + 7, max_x - 2 - end_x, "Macros - 6,7,8,9")
+
         self.stdscr.addstr(start_y + 9, max_x - 2 - end_x, "Backspace - Undo")
         self.stdscr.addstr(start_y + 10, max_x - 2 - end_x, "Enter     - Redo")
         self.stdscr.addstr(start_y + 11, max_x - 2 - end_x, "Delete    - Delete")
